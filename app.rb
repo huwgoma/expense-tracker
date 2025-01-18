@@ -18,9 +18,9 @@ before do
   @categories = ['Food', 'Misc', 'Self-Improvement']
 end
 
-# # # # # # # # 
-#  Expenses   #
-# # # # # # # # 
+# # # # # # #
+#  Expenses #
+# # # # # # # 
 # Dashboard
 get '/' do
   @expenses = Expense.list
@@ -45,6 +45,11 @@ post '/expenses' do
     session[:success] = "Expense successfully created."
     redirect '/'
   end
+end
+
+# View an expense
+get '/expenses/:expense_id' do
+  
 end
 
 

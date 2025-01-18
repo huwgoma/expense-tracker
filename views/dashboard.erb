@@ -1,7 +1,12 @@
+<h1>Expense Tracker</h1>
 <ul>
   <% @expenses.each do |expense| %>
     <li>
-      <%= expense.name %>
+      <a href="/expenses/<%= expense.id %>">
+        <%= expense.name %>
+      </a>
     </li>
   <% end %>
 </ul>
+
+<a href="/expenses/new">Add a new expense</a>
