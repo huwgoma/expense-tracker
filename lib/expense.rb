@@ -19,7 +19,15 @@ class Expense
     @@expenses << self
   end
 
+  def edit(name, price, category)
+    self.name = name
+    self.price = format_price(price)
+    self.category = category
+  end
+
   private
+
+  attr_writer :name, :price, :category
 
   def format_price(price)
     sprintf('%.2f', price)

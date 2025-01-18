@@ -52,9 +52,20 @@ class ExpenseTrackerTest < Minitest::Test
   def test_view_expense
     create_expense("Chipotle", "12.00", "Food")
     
-
     get '/expenses/0'
     assert_includes(last_response.body, "<h3>Expense Name: Chipotle</h3>")
+  end
+
+  # Update
+  def test_edit_expense_form
+    create_expense("Chipotle", "12.00", "Food")
+    
+    get '/expenses/0/edit'
+    assert_includes(last_response.body, %q{<h2>Editing "Chipotle":</h2>})
+  end
+
+  def test_edit_expense
+    
   end
 
   ########################

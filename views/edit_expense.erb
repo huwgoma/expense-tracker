@@ -1,0 +1,24 @@
+<h2>Editing "<%= @expense.name %>":</h2>
+
+<form action="/expenses/<%= @expense.id %>/edit" method="post">
+  <label for="expense-name">Name:</label>
+  <input type="text" id="expense-name" name="name" value="<%= @expense.name %>">
+
+  <label for="expense-price">Price:</label>
+  <input type="number" id="expense-price" name="price" value="<%= @expense.price %>" min="0" step="0.01">
+
+  <div>
+    <h4>Category:</h4>
+
+  <%# Auto-check the existing one? %>
+    <label for="food">Food</label>
+    <input type="radio" id="food" name="category" value="food">
+
+    <label for="misc">Misc</label>
+    <input type="radio" id="misc" name="category" value="misc">
+  </div>
+
+  <button type="submit">Edit</button>
+  <a href="/">Cancel</a>
+</form>
+

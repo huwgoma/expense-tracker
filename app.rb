@@ -36,8 +36,8 @@ end
 # Create new expense
 post '/expenses' do
   name, price, category = params[:name], params[:price], params[:category]
-
   session[:error] = expense_errors(name, price, category)
+
   if session[:error]
     erb :new_expense
   else
@@ -49,10 +49,36 @@ end
 
 # View an expense
 get '/expenses/:expense_id' do
-  @expense = Expense.find(params[:expense_id].to_i)
+  @expense = load_expense(params[:expense_id])
 
   erb :expense
 end
+
+# (Form) - Update an expense
+get '/expenses/:expense_id/edit' do
+  @expense = load_expense(params[:expense_id])
+
+  erb :edit_expense
+end
+
+# Update an expense
+post '/expenses/:expense_id/edit' do
+  name, price, category = params[:name], params[:price], params[:category]
+  session[:error] = expense_errors(name, price, category)
+
+  if session[:error]
+    erb :edit_expense
+  else
+    expense = load_expense(params[:expense_id])
+    expense.edit(name, price, category)
+
+    session[:success] = "Expense successfully updated."
+    redirect "/expenses/#{params[:expense_id]}"
+  end
+end
+
+
+# Delete an expense
 
 
 ########################
@@ -75,4 +101,8 @@ def expense_price_error(price)
   rescue ArgumentError
     'Price must be a valid 2-decimal number.'
   end
+end
+
+def load_expense(id)
+  Expense.find(id.to_i)
 end
