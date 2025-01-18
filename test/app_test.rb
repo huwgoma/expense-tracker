@@ -13,4 +13,15 @@ class ExpenseTrackerTest < Minitest::Test
   def app
     Sinatra::Application
   end
+
+  def test_good_expense_creation
+    
+  end
+
+  def test_bad_expense_creation
+    post '/expenses', name: ""
+    assert_includes(last_response.body, 'Expense name must be between 1-100 characters.')
+    # name => cannot be empty
+    # price
+  end
 end
