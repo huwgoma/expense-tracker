@@ -18,10 +18,23 @@ class ExpenseTrackerTest < Minitest::Test
     
   end
 
-  def test_bad_expense_creation
+  def test_bad_expense_name
     post '/expenses', name: ""
-    assert_includes(last_response.body, 'Expense name must be between 1-100 characters.')
-    # name => cannot be empty
-    # price
+    assert_includes(last_response.body, 'Name must be between 1-100 characters.')
   end
+
+  def test_bad_expense_price
+    post '/expenses', name: "Gym", price: "" # Empty
+    assert_includes(last_response.body, 'Price must be a valid 2-decimal number.')
+    
+    post '/expenses', name: "Gym", price: "abc" # Non-Numeric
+    assert_includes(last_response.body, 'Price must be a valid 2-decimal number.')
+
+    post '/expenses', name: "Gym", price: "12." # Bad Format
+    assert_includes(last_response.body, 'Price must be a valid 2-decimal number.')
+
+    post '/expenses', name: "Gym", price: "-12" # Negative
+    assert_includes(last_response.body, 'Price cannot be negative.')
+  end
+
 end

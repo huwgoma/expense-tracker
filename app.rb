@@ -12,7 +12,9 @@ end
 ########################
 #  Application Routes  #
 ########################
-
+before do
+  @categories = ['Food', 'Misc']
+end
 
 # # # # # # # # 
 #  Expenses   #
@@ -48,16 +50,20 @@ end
 #        Helpers       #
 ########################
 def expense_errors(name, price, category)
-  expense_name_error(name)
-  #|| expense_price_error || expense_category_error
-  # name: must be between 1-100 characters
-  # price: must be numeric; must have either 0 or 2 decimal places
-  # category: must be present (required)
-  # 
-  # array of errors if errors are present
-  # nil if valid (no errors)
+  expense_name_error(name) ||
+    expense_price_error(price) 
+    # || expense_category_error(category)
+
 end
 
 def expense_name_error(name)
-  'Expense name must be between 1-100 characters.' unless name.size.between?(1, 100)
+  'Name must be between 1-100 characters.' unless name.size.between?(1, 100)
+end
+
+def expense_price_error(price)
+  begin
+    'Price cannot be negative.' if sprintf('%.2f', price).to_f.negative?
+  rescue ArgumentError
+    'Price must be a valid 2-decimal number.'
+  end
 end
