@@ -8,8 +8,8 @@ require_relative 'lib/expense'
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
-  #set :erb, :escape_html => :true
   
+  set :erb, :escape_html => :true
 end
 ########################
 #  Application Routes  #
@@ -76,7 +76,6 @@ post '/expenses/:expense_id/edit' do
     redirect "/expenses/#{params[:expense_id]}"
   end
 end
-
 
 # Delete an expense
 
