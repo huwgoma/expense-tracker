@@ -14,12 +14,17 @@ class ExpenseTrackerTest < Minitest::Test
     Sinatra::Application
   end
 
+  def teardown
+    Expense.list.clear
+  end
+
   def test_dashboard
     
   end
 
+  # Create
   def test_good_expense_creation
-    post '/expenses', name: "Gym", price: "15.00", category: "Self-Improvement"
+    post '/expenses', name: "Chipotle", price: "15.00", category: "Food"
 
     assert_equal('Expense successfully created.', session[:success])
   end
@@ -43,10 +48,25 @@ class ExpenseTrackerTest < Minitest::Test
     assert_includes(last_response.body, 'Price cannot be negative.')
   end
 
+  # Read
+  def test_view_expense
+    create_expense("Chipotle", "12.00", "Food")
+    
+
+    get '/expenses/0'
+    assert_includes(last_response.body, "<h3>Expense Name: Chipotle</h3>")
+  end
+
   ########################
   #        Helpers       #
   ########################
   def session
     last_request.env['rack.session']
   end
+
+  def create_expense(name, price, category)
+    Expense.new(name, price, category)
+  end
+
+
 end

@@ -1,6 +1,6 @@
 require 'sinatra'
 
-require 'sinatra/reloader' if development?
+require 'sinatra/reloader'
 require 'pry' if development?
 
 require_relative 'lib/expense'
@@ -49,7 +49,9 @@ end
 
 # View an expense
 get '/expenses/:expense_id' do
-  
+  @expense = Expense.find(params[:expense_id].to_i)
+
+  erb :expense
 end
 
 
