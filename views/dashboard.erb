@@ -1,1 +1,7 @@
-<%= @expenses %>
+<ul>
+  <% @expenses.each do |expense| %>
+    <li>
+      <%= expense.name %>
+    </li>
+  <% end %>
+</ul>

@@ -3,6 +3,8 @@ require 'sinatra'
 require 'sinatra/reloader' if development?
 require 'pry' if development?
 
+require_relative 'lib/expense'
+
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
@@ -13,7 +15,7 @@ end
 #  Application Routes  #
 ########################
 before do
-  @categories = ['Food', 'Misc']
+  @categories = ['Food', 'Misc', 'Self-Improvement']
 end
 
 # # # # # # # # 
@@ -21,7 +23,8 @@ end
 # # # # # # # # 
 # Dashboard
 get '/' do
-  @expenses = ['Purchase 1', 'Purchase 2']
+  @expenses = Expense.list
+
   erb :dashboard
 end
 
@@ -37,12 +40,11 @@ post '/expenses' do
   session[:error] = expense_errors(name, price, category)
   if session[:error]
     erb :new_expense
+  else
+    Expense.new(name, price, category)
+    session[:success] = "Expense successfully created."
+    redirect '/'
   end
-  # validate params (name, price, category)
-  # - if there are any errors, set them and re-render :new_expense
-  # - if there are no errors, create a new Expense object and redirect to 
-  #   dashboard(?)
-  #binding.pry
 end
 
 
