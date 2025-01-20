@@ -4,6 +4,7 @@ ruby '3.2.2'
 
 gem 'sinatra'
 gem 'sinatra-contrib'
+gem 'erubis'
 gem 'puma'
 gem "rackup", "~> 2.2"
 

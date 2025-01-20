@@ -4,3 +4,7 @@
 <p>Category: <%= @expense.category %></p>
 
 <a href="/expenses/<%= @expense.id %>/edit">Edit this expense</a>
+
+<form action="/expenses/<%= @expense.id %>/delete" method="post">
+  <button type="submit">Delete this Expense</button>
+</form>

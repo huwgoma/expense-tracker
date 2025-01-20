@@ -1,21 +1,28 @@
 require 'sinatra'
 
-require 'sinatra/reloader'
-require 'pry' if development?
+# Reloading for lib/ files.
+ROOT = File.expand_path('..', __FILE__)
+RB_CLASS_FILES = File.join(ROOT, 'lib', '*.rb')
 
-require_relative 'lib/expense'
+require 'sinatra/reloader' if development?
+also_reload(RB_CLASS_FILES)
+Dir.glob(RB_CLASS_FILES).each { |file| require file }
+
+require 'pry'
 
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
   
-  set :erb, :escape_html => :true
+  #set :erb, :escape_html => true
 end
+
 ########################
 #  Application Routes  #
 ########################
 before do
   @categories = ['Food', 'Misc', 'Self-Improvement']
+  session[:expenses] ||= []
 end
 
 # # # # # # #
@@ -23,7 +30,7 @@ end
 # # # # # # # 
 # Dashboard
 get '/' do
-  @expenses = Expense.list
+  @expenses = session[:expenses]
 
   erb :dashboard
 end
@@ -41,11 +48,14 @@ post '/expenses' do
   if session[:error]
     erb :new_expense
   else
-    Expense.new(name, price, category)
+    id = generate_expense_id
+    session[:expenses] << Expense.new(name, price, category, id)
     session[:success] = "Expense successfully created."
     redirect '/'
   end
 end
+
+
 
 # View an expense
 get '/expenses/:expense_id' do
@@ -78,6 +88,12 @@ post '/expenses/:expense_id/edit' do
 end
 
 # Delete an expense
+post '/expenses/:expense_id/delete' do
+  #expense = load_expense(params[:expense_id])
+end
+# Viewing expense: [Delete]
+# - Retrieve the expense at expense_id and delete it from @@expenses
+#   (Sidebar: Should we  store expenses in session instead?)
 
 
 ########################
@@ -102,6 +118,13 @@ def expense_price_error(price)
   end
 end
 
+# Temporary solution until lib/ reloading is figured out
+def generate_expense_id
+  return 0 if session[:expenses].empty?
+
+  session[:expenses].map(&:id).max + 1
+end
+
 def load_expense(id)
-  Expense.find(id.to_i)
+  session[:expenses].find { |expense| expense.id == id.to_i }
 end

@@ -5,6 +5,7 @@ GEM
     base64 (0.2.0)
     builder (3.3.0)
     coderay (1.1.3)
+    erubis (2.7.0)
     logger (1.6.5)
     method_source (1.1.0)
     minitest (5.25.4)
@@ -56,6 +57,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  erubis
   minitest
   minitest-reporters
   pry
