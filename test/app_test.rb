@@ -70,8 +70,23 @@ class ExpenseTrackerTest < Minitest::Test
     assert_includes(last_response.body, %q{<h2>Editing "Meat":</h2>})
   end
 
-  def test_edit_expense
+  def test_good_expense_edit
+    post '/expenses/0/edit', 
+      { name: 'Beef', price: '10', category: 'Food' },
+      add_expense_to_session('Meat', '10', 'Food')
+
+    assert_equal('Expense successfully updated.', session[:success])
     
+    get last_response['Location']
+    assert_includes(last_response.body, '<h3>Expense Name: Beef</h3>')
+  end
+
+  def test_bad_expense_edit
+    post '/expenses/0/edit', 
+      { name: '', price: '10', category: 'Food' },
+      add_expense_to_session('Meat', '10', 'Food')
+    
+    assert_includes(last_response.body, 'Name must be between 1-100 characters.')
   end
 
   ########################

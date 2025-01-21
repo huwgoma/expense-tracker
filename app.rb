@@ -74,13 +74,14 @@ end
 # Update an expense
 post '/expenses/:expense_id/edit' do
   name, price, category = params[:name], params[:price], params[:category]
+  @expense = load_expense(params[:expense_id])
+
   session[:error] = expense_errors(name, price, category)
 
   if session[:error]
     erb :edit_expense
   else
-    expense = load_expense(params[:expense_id])
-    expense.edit(name, price, category)
+    @expense.edit(name, price, category)
 
     session[:success] = "Expense successfully updated."
     redirect "/expenses/#{params[:expense_id]}"
@@ -123,7 +124,6 @@ def create_expense(name, price, category)
   Expense.new(name, price, category, id)
 end
 
-# Temporary solution until lib/ reloading is figured out
 def generate_expense_id
   return 0 if session[:expenses].empty?
 
