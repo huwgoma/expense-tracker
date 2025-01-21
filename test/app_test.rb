@@ -5,7 +5,9 @@ require 'minitest/reporters'
 Minitest::Reporters.use!
 require 'rack/test'
 
+require 'pry'
 require_relative '../app'
+
 
 class ExpenseTrackerTest < Minitest::Test
   include Rack::Test::Methods
@@ -14,8 +16,12 @@ class ExpenseTrackerTest < Minitest::Test
     Sinatra::Application
   end
 
+  def setup
+    @expense_id = 0
+  end
+
   def teardown
-    Expense.list.clear
+    @expense_id = 0
   end
 
   def test_dashboard
@@ -50,18 +56,18 @@ class ExpenseTrackerTest < Minitest::Test
 
   # Read
   def test_view_expense
-    create_expense("Chipotle", "12.00", "Food")
+    get '/expenses/0', {}, add_expense_to_session('Meat', '10', 'Food')
     
-    get '/expenses/0'
-    assert_includes(last_response.body, "<h3>Expense Name: Chipotle</h3>")
+    assert_includes(last_response.body, "<h3>Expense Name: Meat</h3>")
+
+    get '/expenses/1', {}, add_expense_to_session('Gym', '12', 'Misc.')
+    assert_includes(last_response.body, "<h3>Expense Name: Gym</h3>")
   end
 
   # Update
   def test_edit_expense_form
-    create_expense("Chipotle", "12.00", "Food")
-    
-    get '/expenses/0/edit'
-    assert_includes(last_response.body, %q{<h2>Editing "Chipotle":</h2>})
+    get '/expenses/0/edit', {}, add_expense_to_session('Meat', '10', 'Food')
+    assert_includes(last_response.body, %q{<h2>Editing "Meat":</h2>})
   end
 
   def test_edit_expense
@@ -76,8 +82,14 @@ class ExpenseTrackerTest < Minitest::Test
   end
 
   def create_expense(name, price, category)
-    Expense.new(name, price, category)
+    expense = Expense.new(name, price, category, @expense_id)
+    @expense_id += 1
+    expense
   end
 
-
+  def add_expense_to_session(name, price, category)
+    { 'rack.session' => { 
+      expenses: [create_expense(name, price, category)] 
+    } }
+  end
 end

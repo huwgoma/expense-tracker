@@ -4,8 +4,11 @@ require 'sinatra'
 ROOT = File.expand_path('..', __FILE__)
 RB_CLASS_FILES = File.join(ROOT, 'lib', '*.rb')
 
-require 'sinatra/reloader' if development?
-also_reload(RB_CLASS_FILES)
+if development?
+  require 'sinatra/reloader'
+  also_reload(RB_CLASS_FILES)
+end
+
 Dir.glob(RB_CLASS_FILES).each { |file| require file }
 
 require 'pry'
@@ -48,14 +51,11 @@ post '/expenses' do
   if session[:error]
     erb :new_expense
   else
-    id = generate_expense_id
-    session[:expenses] << Expense.new(name, price, category, id)
+    session[:expenses] << create_expense(name, price, category)
     session[:success] = "Expense successfully created."
     redirect '/'
   end
 end
-
-
 
 # View an expense
 get '/expenses/:expense_id' do
@@ -116,6 +116,11 @@ def expense_price_error(price)
   rescue ArgumentError
     'Price must be a valid 2-decimal number.'
   end
+end
+
+def create_expense(name, price, category)
+  id = generate_expense_id
+  Expense.new(name, price, category, id)
 end
 
 # Temporary solution until lib/ reloading is figured out
