@@ -28,6 +28,11 @@ before do
   session[:expenses] ||= []
 end
 
+not_found do
+  session[:error] = "Sorry, that page wasn't found."
+  redirect '/'
+end
+
 # # # # # # #
 #  Expenses #
 # # # # # # # 
@@ -60,7 +65,7 @@ end
 # View an expense
 get '/expenses/:expense_id' do
   @expense = load_expense(params[:expense_id])
-
+  
   erb :expense
 end
 
@@ -131,5 +136,12 @@ def generate_expense_id
 end
 
 def load_expense(id)
-  session[:expenses].find { |expense| expense.id == id.to_i }
+  session[:expenses].find(proc { expense_does_not_exist }) do |expense|
+    expense.id == id.to_i
+  end
+end
+
+def expense_does_not_exist
+  session[:error] = "Sorry, that expense does not exist."
+  redirect '/'
 end

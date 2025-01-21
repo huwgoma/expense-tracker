@@ -28,6 +28,12 @@ class ExpenseTrackerTest < Minitest::Test
     
   end
 
+  def test_not_found
+    get '/expenses/non/existent', {}, add_expenses_to_session
+    assert_equal("Sorry, that page wasn't found.", session[:error])
+    assert_equal(302, last_response.status)
+  end
+
   # Create
   def test_good_expense_creation
     post '/expenses', name: "Chipotle", price: "15.00", category: "Food"
@@ -55,13 +61,20 @@ class ExpenseTrackerTest < Minitest::Test
   end
 
   # Read
-  def test_view_expense
+  def test_good_view_expense
     get '/expenses/0', {}, add_expenses_to_session
     
     assert_includes(last_response.body, "<h3>Expense Name: Beef</h3>")
 
     get '/expenses/1'
     assert_includes(last_response.body, "<h3>Expense Name: Gym</h3>")
+  end
+
+  def test_bad_view_expense
+    get '/expenses/3', {}, add_expenses_to_session
+
+    assert_equal("Sorry, that expense does not exist.", session[:error])
+    assert_equal(302, last_response.status)
   end
 
   # Update
