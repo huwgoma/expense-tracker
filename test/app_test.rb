@@ -91,7 +91,12 @@ class ExpenseTrackerTest < Minitest::Test
 
   # Delete
   def test_expense_delete
-    #post '/expenses/0/delete'
+    post '/expenses/2/delete', {}, add_expenses_to_session
+
+    assert_equal('Expense successfully deleted.', session[:success])
+
+    get last_response['Location']
+    refute_includes(last_response.body, 'Lamb')
   end
 
   ########################

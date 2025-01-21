@@ -90,12 +90,12 @@ end
 
 # Delete an expense
 post '/expenses/:expense_id/delete' do
-  #expense = load_expense(params[:expense_id])
+  expense_id = params[:expense_id].to_i
+  session[:expenses].delete_if { |expense| expense.id == expense_id }
+  
+  session[:success] = 'Expense successfully deleted.'
+  redirect '/'
 end
-# Viewing expense: [Delete]
-# - Retrieve the expense at expense_id and delete it from @@expenses
-#   (Sidebar: Should we  store expenses in session instead?)
-
 
 ########################
 #        Helpers       #
