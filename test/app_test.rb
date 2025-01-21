@@ -17,11 +17,11 @@ class ExpenseTrackerTest < Minitest::Test
   end
 
   def setup
-    @expense_id = 0
+    
   end
 
   def teardown
-    @expense_id = 0
+    
   end
 
   def test_dashboard
@@ -56,37 +56,42 @@ class ExpenseTrackerTest < Minitest::Test
 
   # Read
   def test_view_expense
-    get '/expenses/0', {}, add_expense_to_session('Meat', '10', 'Food')
+    get '/expenses/0', {}, add_expenses_to_session
     
-    assert_includes(last_response.body, "<h3>Expense Name: Meat</h3>")
+    assert_includes(last_response.body, "<h3>Expense Name: Beef</h3>")
 
-    get '/expenses/1', {}, add_expense_to_session('Gym', '12', 'Misc.')
+    get '/expenses/1'
     assert_includes(last_response.body, "<h3>Expense Name: Gym</h3>")
   end
 
   # Update
   def test_edit_expense_form
-    get '/expenses/0/edit', {}, add_expense_to_session('Meat', '10', 'Food')
-    assert_includes(last_response.body, %q{<h2>Editing "Meat":</h2>})
+    get '/expenses/0/edit', {}, add_expenses_to_session
+    assert_includes(last_response.body, %q{<h2>Editing "Beef":</h2>})
   end
 
   def test_good_expense_edit
     post '/expenses/0/edit', 
-      { name: 'Beef', price: '10', category: 'Food' },
-      add_expense_to_session('Meat', '10', 'Food')
+      { name: 'Ribeye', price: '12', category: 'Food' },
+      add_expenses_to_session
 
     assert_equal('Expense successfully updated.', session[:success])
     
     get last_response['Location']
-    assert_includes(last_response.body, '<h3>Expense Name: Beef</h3>')
+    assert_includes(last_response.body, '<h3>Expense Name: Ribeye</h3>')
   end
 
   def test_bad_expense_edit
     post '/expenses/0/edit', 
       { name: '', price: '10', category: 'Food' },
-      add_expense_to_session('Meat', '10', 'Food')
+      add_expenses_to_session
     
     assert_includes(last_response.body, 'Name must be between 1-100 characters.')
+  end
+
+  # Delete
+  def test_expense_delete
+    #post '/expenses/0/delete'
   end
 
   ########################
@@ -96,15 +101,18 @@ class ExpenseTrackerTest < Minitest::Test
     last_request.env['rack.session']
   end
 
-  def create_expense(name, price, category)
-    expense = Expense.new(name, price, category, @expense_id)
-    @expense_id += 1
-    expense
+  # Populate session[:expenses] with pre-defined dummy expenses
+  def add_expenses_to_session
+    { 'rack.session' => { 
+      expenses: [
+        create_expense('Beef', '10', 'Food', 0),
+        create_expense('Gym', '60', 'Misc.', 1),
+        create_expense('Lamb', '15', 'Food', 2)
+      ]
+    }}
   end
 
-  def add_expense_to_session(name, price, category)
-    { 'rack.session' => { 
-      expenses: [create_expense(name, price, category)] 
-    } }
+  def create_expense(name, price, category, id)
+    Expense.new(name, price, category, id)
   end
 end
